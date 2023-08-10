@@ -110,13 +110,22 @@ public class Player : MonoBehaviour
         }*/
         #endregion
 
-        if (isWalking && characterController.isGrounded)
+        if (isWalking && !isWalkingAnimation)
         {
             animator.SetBool(isWalkingHash, true);
         }
-        if (isWalking && characterController.isGrounded)
+        else if (!isWalking && isWalkingAnimation)
         {
             animator.SetBool(isWalkingHash, false);
+        }
+
+        if (isJumping && !isJumpingAnimation)
+        {
+            animator.SetBool(isJumpingHash, true);
+        }
+        else if (!isJumping && isJumpingAnimation)
+        {
+            animator.SetBool(isJumpingHash, false);
         }
     }
 
