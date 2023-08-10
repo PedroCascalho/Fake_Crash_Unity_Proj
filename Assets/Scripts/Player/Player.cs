@@ -19,6 +19,11 @@ public class Player : MonoBehaviour
     private Animator animator;
     private CharacterController characterController;
 
+    #region AnimParameters
+    private bool isJumpingHash;
+    private bool velocityHas;
+    #endregion
+
     private void Awake()
     {
         playerTransform = GetComponent<Transform>();
