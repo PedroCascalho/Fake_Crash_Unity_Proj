@@ -114,6 +114,10 @@ public class Player : MonoBehaviour
         {
             animator.SetBool(isWalkingHash, true);
         }
+        if (isWalking && characterController.isGrounded)
+        {
+            animator.SetBool(isWalkingHash, false);
+        }
     }
 
     private void OnEnable()
