@@ -9,26 +9,30 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float velocity;
     [SerializeField] private float jumpHeight;
+    #region privateVariables
+
+    #endregion
+
+    #region AnimParameters
+    private int isJumpingHash;
+    private int isWalkingHash;
+    #endregion
 
     private PlayerControls playerInputs;
 
     Vector3 currentMovementDirection;
     private bool isJumping;
 
-    private Transform playerTransform;
-    private Animator animator;
+    private Transform playerTransform;    
     private CharacterController characterController;
-
-    #region AnimParameters
-    private bool isJumpingHash;
-    private bool velocityHas;
-    #endregion
+    private Animator animator;    
 
     private void Awake()
     {
         playerTransform = GetComponent<Transform>();
         animator = GetComponent<Animator>();
         characterController = GetComponent<CharacterController>();
+        GetAnimationParameters();
 
         playerInputs = new PlayerControls();
 
@@ -38,6 +42,12 @@ public class Player : MonoBehaviour
 
         playerInputs.PlayerActions.Jump.started += OnJumpInput;
         playerInputs.PlayerActions.Jump.performed += OnJumpInput;
+    }
+
+    private void GetAnimationParameters()
+    {
+        isJumpingHash = Animator.StringToHash("isJumping");
+        isWalkingHash = Animator.StringToHash("isWalking");
     }
 
     private void OnMoveInput(InputAction.CallbackContext context)
@@ -66,6 +76,7 @@ public class Player : MonoBehaviour
     {
         MovePlayer();
         GravityHandler();
+        AnimationHandler();
     }
 
     private void GravityHandler()
@@ -76,6 +87,33 @@ public class Player : MonoBehaviour
     private void MovePlayer()
     {
         characterController.Move(currentMovementDirection * velocity * Time.deltaTime);
+
+        if (characterController.isGrounded)
+        {
+            isJumping = false;
+        }
+    }
+
+    private void AnimationHandler()
+    {
+        bool isJumpingAnimation = animator.GetBool(isJumpingHash);
+        bool isWalkingAnimation = animator.GetBool(isWalkingHash);
+        bool isWalking = currentMovementDirection.x != 0 || currentMovementDirection.z != 0;
+        #region Outra maneira de escrever a linha de cima
+        /*if(currentMovementDirection.x != 0 || currentMovementDirection.z != 0)
+        {
+            isWalking = true;
+        }
+        else
+        {
+            isWalking = false
+        }*/
+        #endregion
+
+        if (isWalking && characterController.isGrounded)
+        {
+            animator.SetBool(isWalkingHash, true);
+        }
     }
 
     private void OnEnable()
