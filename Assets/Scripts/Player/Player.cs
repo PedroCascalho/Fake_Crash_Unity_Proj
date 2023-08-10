@@ -22,10 +22,12 @@ public class Player : MonoBehaviour
 
     Vector3 currentMovementDirection;
     private bool isJumping;
+    private bool isWalking;
 
     private Transform playerTransform;    
     private CharacterController characterController;
-    private Animator animator;    
+    private Animator animator;
+    private float rotationFactorPerFrame= 10f;
 
     private void Awake()
     {
@@ -77,6 +79,22 @@ public class Player : MonoBehaviour
         MovePlayer();
         GravityHandler();
         AnimationHandler();
+    }
+
+    private void RotationHanlder()
+    {
+        Vector3 positionToLookAt;
+        positionToLookAt.x = currentMovementDirection.x;
+        positionToLookAt.y = 0f;
+        positionToLookAt.z = currentMovementDirection.z;
+        Quaternion currentRotation = transform.rotation;
+
+        if (isWalking)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(positionToLookAt);
+            transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, rotationFactorPerFrame * Time.deltaTime);
+        }
+
     }
 
     private void GravityHandler()
