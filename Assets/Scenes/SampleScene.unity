@@ -141,7 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocity: 10
-  jumpForce: 50
+  jumpHeight: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,6 +442,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2302508028792424340, guid: 7b986feb8661a0c489e1e1f97388238a, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: f2f3a5032919ecb4d8bab97f139419da, type: 2}
     - target: {fileID: 6987276331244036257, guid: 7b986feb8661a0c489e1e1f97388238a, type: 3}
       propertyPath: m_Name
       value: Jammo_Player

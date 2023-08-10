@@ -5,13 +5,15 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    private const float gravityValue = -9.81f;
+
     [SerializeField] private float velocity;
-    [SerializeField] private float jumpForce;
+    [SerializeField] private float jumpHeight;
+
     private PlayerControls playerInputs;
 
     Vector3 currentMovementDirection;
     private bool isJumping;
-    private bool canJump;
 
     private Transform playerTransform;
     private Animator animator;
@@ -49,12 +51,21 @@ public class Player : MonoBehaviour
 
     private void JumpPlayer()
     {
-        characterController.attachedRigidbody.AddForce(Vector3.up * jumpForce);
+        if (characterController.isGrounded)
+        {
+            currentMovementDirection.y = Mathf.Sqrt(jumpHeight * gravityValue * -1);
+        }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         MovePlayer();
+        GravityHandler();
+    }
+
+    private void GravityHandler()
+    {
+        currentMovementDirection.y += gravityValue * Time.deltaTime;
     }
 
     private void MovePlayer()
