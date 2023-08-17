@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
     private bool isMoving;
     private float currentVelocity;
 
-    private int isWalkingHash;
     private int isJumpingHash;
     private int velocityHash;
 
@@ -40,7 +39,7 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        MovePlayer();
+        MoveHandler();
         AnimationHandler();
         RotationHandler();
     }
@@ -67,7 +66,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void MovePlayer()
+    private void MoveHandler()
     {
         cameraRelativeMovement = ConverToCameraSpace(currentMovement);
         characterController.Move(cameraRelativeMovement * velocity * Time.deltaTime);
@@ -77,27 +76,10 @@ public class Player : MonoBehaviour
 
     private void AnimationHandler()
     {
-        bool isMovingAnimation = animator.GetBool(isWalkingHash);
         bool isJumpingAnimation = animator.GetBool(isJumpingHash);
         animator.SetFloat(velocityHash, currentVelocity);
 
-        if(isMoving && !isMovingAnimation)
-        {
-            animator.SetBool(isWalkingHash, true);
-        }
-        else if (!isMoving && isMovingAnimation)
-        {
-            animator.SetBool(isWalkingHash, false);
-        }
-
-        if(isJumping && !isJumpingAnimation)
-        {
-            animator.SetBool(isJumpingHash, true);
-        }
-        else if(!isJumping && isJumpingAnimation)
-        {
-            animator.SetBool(isJumpingHash, false);
-        }
+        
     }
 
     private Vector3 ConverToCameraSpace(Vector3 vectorToRotate)
@@ -139,7 +121,6 @@ public class Player : MonoBehaviour
 
     private void GetAnimatorParameters()
     {
-        isWalkingHash = Animator.StringToHash("isMoving");
         isJumpingHash = Animator.StringToHash("isJumping");
         velocityHash = Animator.StringToHash("velocity");
     }
