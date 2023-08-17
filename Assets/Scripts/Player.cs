@@ -7,9 +7,12 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    private const float gravityScale = -9.81f;
+
     private PlayerControls playerControl;
     private CharacterController characterController;
     private Animator animator;
+    private Transform playerTransform;
     private Vector3 currentMovement;
     private Vector3 cameraRelativeMovement;
     private bool isJumping;
@@ -19,7 +22,7 @@ public class Player : MonoBehaviour
     private int isJumpingHash;
     private int velocityHash;
 
-    [SerializeField] private float jumpForce = 100;
+    [SerializeField] private float jumpHeight = 10;
     [SerializeField] private float velocity = 10;
 
     private void Awake()
@@ -27,6 +30,7 @@ public class Player : MonoBehaviour
         playerControl = new PlayerControls();
         characterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        playerTransform = GetComponent<Transform>();
         GetAnimatorParameters();
 
         playerControl.PlayerActions.Move.started += OnMoveInput;
@@ -42,12 +46,20 @@ public class Player : MonoBehaviour
         MoveHandler();
         AnimationHandler();
         RotationHandler();
+        GravityHandler();
+    }
+
+    private void GravityHandler()
+    {
+
+        currentMovement.y += gravityScale * Time.deltaTime;
     }
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
         Vector2 inputData = context.ReadValue<Vector2>();
         currentMovement.x = inputData.x;
+        currentMovement.y = 0;
         currentMovement.z = inputData.y;
         isMoving = inputData.x != 0 || inputData.y != 0;
     }
@@ -62,7 +74,7 @@ public class Player : MonoBehaviour
     {
         if (characterController.isGrounded)
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
+            currentMovement.y = Mathf.Sqrt(jumpHeight * gravityScale * -1);
         }
     }
 
