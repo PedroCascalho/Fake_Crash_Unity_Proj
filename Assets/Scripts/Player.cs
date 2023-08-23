@@ -7,67 +7,48 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    private PlayerControls playerControl;
+    private const float gravityScale = -9.81f;
+
     private CharacterController characterController;
     private Animator animator;
-    private Vector3 currentMovement;
-    private Vector3 cameraRelativeMovement;
-    private bool isJumping;
-    private bool isMoving;
+    private Vector3 cameraRelativeMovement;    
     private float currentVelocity;
-
-    private int isWalkingHash;
     private int isJumpingHash;
     private int velocityHash;
 
-    [SerializeField] private float jumpForce = 100;
-    [SerializeField] private float velocity = 10;
+    
 
     private void Awake()
     {
-        playerControl = new PlayerControls();
         characterController = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        playerTransform = GetComponent<Transform>();
         GetAnimatorParameters();
-
-        playerControl.PlayerActions.Move.started += OnMoveInput;
-        playerControl.PlayerActions.Move.performed += OnMoveInput;
-        playerControl.PlayerActions.Move.canceled += OnMoveInput;
-
-        playerControl.PlayerActions.Jump.started += OnJumpInput;
-        playerControl.PlayerActions.Jump.canceled += OnJumpInput;
     }
 
     void FixedUpdate()
     {
-        MovePlayer();
+        MoveHandler();
         AnimationHandler();
         RotationHandler();
+        GravityHandler();
     }
 
-    public void OnMoveInput(InputAction.CallbackContext context)
+    private void GravityHandler()
     {
-        Vector2 inputData = context.ReadValue<Vector2>();
-        currentMovement.x = inputData.x;
-        currentMovement.z = inputData.y;
-        isMoving = inputData.x != 0 || inputData.y != 0;
-    }
 
-    public void OnJumpInput(InputAction.CallbackContext context)
-    {
-        isJumping = context.ReadValueAsButton();
-        Jump();
+        currentMovement.y += gravityScale * Time.deltaTime;
     }
 
     private void Jump()
     {
         if (characterController.isGrounded)
         {
-            GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
+            currentMovement.y = Mathf.Sqrt(jumpHeight * gravityScale * -1);
         }
     }
 
-    private void MovePlayer()
+    private void MoveHandler()
     {
         cameraRelativeMovement = ConverToCameraSpace(currentMovement);
         characterController.Move(cameraRelativeMovement * velocity * Time.deltaTime);
@@ -77,27 +58,10 @@ public class Player : MonoBehaviour
 
     private void AnimationHandler()
     {
-        bool isMovingAnimation = animator.GetBool(isWalkingHash);
         bool isJumpingAnimation = animator.GetBool(isJumpingHash);
         animator.SetFloat(velocityHash, currentVelocity);
 
-        if(isMoving && !isMovingAnimation)
-        {
-            animator.SetBool(isWalkingHash, true);
-        }
-        else if (!isMoving && isMovingAnimation)
-        {
-            animator.SetBool(isWalkingHash, false);
-        }
-
-        if(isJumping && !isJumpingAnimation)
-        {
-            animator.SetBool(isJumpingHash, true);
-        }
-        else if(!isJumping && isJumpingAnimation)
-        {
-            animator.SetBool(isJumpingHash, false);
-        }
+        
     }
 
     private Vector3 ConverToCameraSpace(Vector3 vectorToRotate)
@@ -139,7 +103,6 @@ public class Player : MonoBehaviour
 
     private void GetAnimatorParameters()
     {
-        isWalkingHash = Animator.StringToHash("isMoving");
         isJumpingHash = Animator.StringToHash("isJumping");
         velocityHash = Animator.StringToHash("velocity");
     }
