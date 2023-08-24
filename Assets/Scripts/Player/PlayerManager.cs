@@ -8,14 +8,16 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance;
 
-    private PlayerControls playerControl;
+    private PlayerMovementComponent movementComponent;
+
     private Transform playerTransform;
-    private Vector3 currentMovement;
+    
     private bool isJumping;
     private bool isMoving;
 
     [SerializeField] private float jumpHeight = 10;
     [SerializeField] private float velocity = 10;
+    [SerializeField] private int lives = 1;
 
     private void Awake()
     {
@@ -29,28 +31,35 @@ public class PlayerManager : MonoBehaviour
             Destroy(this.gameObject);
         }
         #endregion
-        playerControl = new PlayerControls();
-
-        playerControl.PlayerActions.Move.started += OnMoveInput;
-        playerControl.PlayerActions.Move.performed += OnMoveInput;
-        playerControl.PlayerActions.Move.canceled += OnMoveInput;
-
-        playerControl.PlayerActions.Jump.started += OnJumpInput;
-        playerControl.PlayerActions.Jump.canceled += OnJumpInput;
+        playerTransform = GetComponent<Transform>();
+        movementComponent = GetComponent<PlayerMovementComponent>();
+        InputManager.onMove += MovePlayer;
     }
 
-    public void OnMoveInput(InputAction.CallbackContext context)
+    private void MovePlayer(InputAction.CallbackContext context)
     {
-        Vector2 inputData = context.ReadValue<Vector2>();
-        currentMovement.x = inputData.x;
-        currentMovement.y = 0;
-        currentMovement.z = inputData.y;
-        isMoving = inputData.x != 0 || inputData.y != 0;
+        movementComponent.MovePlayer(context);
     }
 
-    public void OnJumpInput(InputAction.CallbackContext context)
+    public bool GetIsMoving()
     {
-        isJumping = context.ReadValueAsButton();
-        Jump();
+        return isMoving;
     }
+
+    public void SetIsMoving(bool isMoving)
+    {
+        this.isMoving = isMoving;
+    }
+
+    public float GetPlayerVelocity()
+    {
+        return velocity;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.onMove -= MovePlayer;
+    }
+
+
 }
