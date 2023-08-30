@@ -11,7 +11,6 @@ public class InputManager : MonoBehaviour
     public delegate void OnMove(InputAction.CallbackContext context);
     public static event OnMove onMove;
 
-
     private void Awake()
     {
         playerControl = new PlayerControls();
