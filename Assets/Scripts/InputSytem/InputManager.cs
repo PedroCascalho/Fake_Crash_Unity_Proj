@@ -8,8 +8,7 @@ public class InputManager : MonoBehaviour
 {
     private PlayerControls playerControl;
 
-    public delegate void OnMove(InputAction.CallbackContext context);
-    public static event OnMove onMove;
+    public event Action<InputAction.CallbackContext> OnMove;
 
     private void Awake()
     {
@@ -25,7 +24,7 @@ public class InputManager : MonoBehaviour
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
-        onMove.Invoke(context);
+        OnMove?.Invoke(context);
     }
 
     public void OnJumpInput(InputAction.CallbackContext context)

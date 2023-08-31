@@ -9,14 +9,12 @@ public class PlayerMovementComponent : MonoBehaviour
 {
     private Vector3 currentMovement;
     private Vector2 inputData;
-    private float playerVelocity;
     private bool canMove;
     private CharacterController characterController;
 
     private void Awake()
     {
-        characterController = PlayerManager.instance.GetCharacterController();
-        playerVelocity = PlayerManager.instance.GetPlayerVelocity();
+        characterController = GetComponent<CharacterController>();
     }
 
     private void Update()

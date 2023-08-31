@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static UnityEditor.Timeline.TimelinePlaybackControls;
 
 public class PlayerManager : MonoBehaviour
 {
-    public static PlayerManager instance;
-
-    private PlayerMovementComponent movementComponent;
+    public event Action<float> OnMoveInputReceived;
 
     private Transform playerTransform;
-    private CharacterController characterController;
     private bool isJumping;
     private bool isMoving;
 
@@ -22,23 +18,19 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        #region Singleton
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
-        #endregion       
-
+        
         movementComponent = GetComponent<PlayerMovementComponent>();
         playerTransform = GetComponent<Transform>();
         characterController = GetComponent<CharacterController>();
         InputManager.onMove += MovePlayer;
+        PlayerManagerSetUp();
     }
 
+
+    private void PlayerManagerSetUp()
+    {
+        GameSystem.OnMoveInputContextReceived += MovePlayer;
+    }
 
     private void MovePlayer(InputAction.CallbackContext context)
     {
