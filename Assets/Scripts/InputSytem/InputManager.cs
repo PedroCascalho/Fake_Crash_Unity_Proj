@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -9,6 +10,7 @@ public class InputManager : MonoBehaviour
     private PlayerControls playerControl;
 
     public event Action<InputAction.CallbackContext> OnMove;
+    public event Action<bool> OnJump;
 
     private void Awake()
     {
@@ -24,13 +26,13 @@ public class InputManager : MonoBehaviour
 
     public void OnMoveInput(InputAction.CallbackContext context)
     {
+        //? = Somente será invocado caso existe um listener no event
         OnMove?.Invoke(context);
     }
 
     public void OnJumpInput(InputAction.CallbackContext context)
     {
-        //isJumping = context.ReadValueAsButton();
-        //Jump();
+        OnJump?.Invoke(context.ReadValueAsButton());
     }
 
     private void OnEnable()

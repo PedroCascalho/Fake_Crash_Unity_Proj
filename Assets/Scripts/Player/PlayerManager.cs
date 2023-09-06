@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
-    public event Action<float> OnMoveInputReceived;
-
+    public static event Action<InputAction.CallbackContext, float> HandleMoveInput;
+    public static event Action<bool> HandleJumpInput;
     private Transform playerTransform;
     private bool isJumping;
     private bool isMoving;
@@ -18,63 +16,29 @@ public class PlayerManager : MonoBehaviour
 
     private void Awake()
     {
-        
-        movementComponent = GetComponent<PlayerMovementComponent>();
-        playerTransform = GetComponent<Transform>();
-        characterController = GetComponent<CharacterController>();
-        InputManager.onMove += MovePlayer;
-        PlayerManagerSetUp();
+        PlayerManagerSetUpListenerns();
     }
 
-
-    private void PlayerManagerSetUp()
+    private void PlayerManagerSetUpListenerns()
     {
         GameSystem.OnMoveInputContextReceived += MovePlayer;
+        GameSystem.OnJumpInputContextReceived += JumpPlayer;
+    }
+
+    private void JumpPlayer(bool isJumpPressed)
+    {
+        HandleJumpInput?.Invoke(isJumpPressed);
     }
 
     private void MovePlayer(InputAction.CallbackContext context)
     {
-        movementComponent.MovePlayer(context);
-    }
-
-    public bool GetIsMoving()
-    {
-        return isMoving;
-    }
-
-    public void SetIsMoving(bool isMoving)
-    {
-        this.isMoving = isMoving;
-    }
-
-    public float GetPlayerVelocity()
-    {
-        return velocity;
-    }
-    public float GetCurrentVelocity()
-    {
-        print(characterController.velocity.magnitude);
-        return characterController.velocity.magnitude;
-    }
-
-    public CharacterController GetCharacterController()
-    {
-        return characterController;
-    }
-
-    public void SetCharacterController(CharacterController characterController)
-    {
-        this.characterController = characterController;
-    }
-
-    public bool GetIsJumping()
-    {
-        return isJumping;
+        isMoving = context.ReadValue<Vector2>().x != 0 || context.ReadValue<Vector2>().y != 0;
+        HandleMoveInput?.Invoke(context, velocity);
     }
 
     private void OnDisable()
     {
-        InputManager.onMove -= MovePlayer;
+        GameSystem.OnMoveInputContextReceived -= MovePlayer;
     }
 
 }
